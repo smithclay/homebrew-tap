@@ -1,22 +1,17 @@
 class Claudetainer < Formula
-  desc "Production-ready Claude Code workflows for any dev container"
+  desc "Claude Code workflows for any dev container"
   homepage "https://github.com/smithclay/claudetainer"
-  url "https://github.com/smithclay/claudetainer/archive/v0.1.0.tar.gz"
-  sha256 ""  # Will be automatically updated by GitHub Actions
+  url "https://github.com/smithclay/claudetainer/releases/download/cli-v0.2.16/claudetainer"
+  sha256 "b7195491a5a1fe14565605b5b67a6df596d79cf1cb043f2d8be686c9819df160"
   license "MIT"
-  head "https://github.com/smithclay/claudetainer.git", branch: "main"
+  version "0.2.16"
 
   depends_on "node" => :optional
   depends_on "docker" => :optional
 
   def install
-    bin.install "bin/claudetainer"
-    
-    # Install feature files for local testing
-    prefix.install "src"
-    
-    # Install documentation
-    doc.install "README.md", "DEVELOPMENT.md", "LICENSE"
+    # Since the URL points to a single binary, install it directly
+    bin.install "claudetainer"
   end
 
   test do
@@ -39,7 +34,7 @@ class Claudetainer < Formula
         claudetainer up
         claudetainer ssh
 
-      Documentation: #{doc}/README.md
+      More info: #{homepage}
     EOS
   end
 end
