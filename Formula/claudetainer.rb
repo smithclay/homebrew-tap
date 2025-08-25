@@ -1,10 +1,10 @@
 class Claudetainer < Formula
   desc "Claude Code workflows for any dev container"
   homepage "https://github.com/smithclay/claudetainer"
-  url "https://github.com/smithclay/claudetainer/releases/download/cli-v0.3.3/claudetainer"
-  sha256 "52b17693e381c6c57007ab471f12c579a4195281ead975b08f6329f7422250b3"
+  url "https://github.com/smithclay/claudetainer/releases/download/cli-v0.4.0/claudetainer"
+  sha256 "972ea487cee2b7fa8d5167233005fe3b3837ff78f0385e7875243760e7eb4144"
   license "MIT"
-  version "0.3.3"
+  version "0.4.0"
 
   depends_on "node" => :optional
   depends_on "docker" => :optional
