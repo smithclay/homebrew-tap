@@ -39,7 +39,7 @@ bind host or token, run the server yourself.
 ## Automation
 
 `duckdb-otlp` bumps itself. [`update-duckdb-otlp.yml`](.github/workflows/update-duckdb-otlp.yml)
-polls the upstream releases API every six hours; when the tag moves,
+polls the upstream releases API weekly; when the tag moves,
 [`update-duckdb-otlp.py`](.github/scripts/update-duckdb-otlp.py) rewrites the
 version, URLs and checksums, CI installs and tests the result on macOS and
 Linux, and only then does the bump land on `main`.
@@ -49,7 +49,7 @@ per-asset digest the GitHub API reports, so a bump downloads nothing.
 
 This is a pull model with **no credentials anywhere** — no PAT, no GitHub App
 key, no cross-repo secret. The tap reads a public API and pushes to itself with
-the built-in `GITHUB_TOKEN`. The tradeoff is up to six hours of lag, and the
+the built-in `GITHUB_TOKEN`. The tradeoff is up to a week of lag, and the
 fact that GitHub disables scheduled workflows in a repository that has gone 60
 days without a commit.
 

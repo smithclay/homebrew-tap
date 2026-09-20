@@ -13,9 +13,10 @@ name: Update duckdb-otlp
 
 on:
   schedule:
-    # Releases are infrequent, so six-hourly is plenty and costs four API calls
-    # a day. Off the hour to dodge the cron stampede GitHub queues behind.
-    - cron: "17 */6 * * *"
+    # Releases are infrequent enough that weekly keeps up. Mondays 09:17 UTC --
+    # off the hour and off midnight to dodge the cron stampede GitHub queues
+    # behind. `gh workflow run` pulls a release in sooner when one matters.
+    - cron: "17 9 * * 1"
   workflow_dispatch:
     inputs:
       tag:
