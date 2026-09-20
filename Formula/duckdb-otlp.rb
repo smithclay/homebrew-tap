@@ -1,7 +1,7 @@
 class DuckdbOtlp < Formula
   desc "Stream, store, and query OpenTelemetry (OTLP) data in DuckDB"
   homepage "https://smithclay.github.io/duckdb-otlp/"
-  version "0.7.0"
+  version "0.7.2"
   license "MIT"
 
   livecheck do
@@ -11,23 +11,23 @@ class DuckdbOtlp < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.0/duckdb-otlp-v0.7.0-darwin-arm64.tar.gz"
-      sha256 "1db49f62549629d5995c1ec2c3deb34827b2ea4efbb2c97c8ab99f52882dc8a5"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.2/duckdb-otlp-v0.7.2-darwin-arm64.tar.gz"
+      sha256 "c014701be366161514c19204fa3ae7d039fb8a07f0124dd129e6e6d3858dd1ed"
     end
     on_intel do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.0/duckdb-otlp-v0.7.0-darwin-amd64.tar.gz"
-      sha256 "c2b5497686c0e07d848c2fe13d87627846dbed4b4e8f84a0b0c2157c4b0dc97a"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.2/duckdb-otlp-v0.7.2-darwin-amd64.tar.gz"
+      sha256 "d5091249a1211201e8c6cbb3ecc5e98def522a0f625241a423cb4604dafeff2d"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.0/duckdb-otlp-v0.7.0-linux-arm64.tar.gz"
-      sha256 "eec89dc5f40c1651898539ccbe0e221b7fdcab86cbe07781e520b387c346c1bb"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.2/duckdb-otlp-v0.7.2-linux-arm64.tar.gz"
+      sha256 "cf22f145652f81b9bb3779a069cf64c3e0815a36e3dc765721ad3751e5d81c93"
     end
     on_intel do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.0/duckdb-otlp-v0.7.0-linux-amd64.tar.gz"
-      sha256 "eb0c5178868f47d36f39880d78a9b331351fe7f50f8f8d327303d5f6355c14e7"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.7.2/duckdb-otlp-v0.7.2-linux-amd64.tar.gz"
+      sha256 "6d6862c7fe5ec0f3e3f6e1236190819a5ddc47af5a1b677df6e63ca0b0777e27"
     end
   end
 
