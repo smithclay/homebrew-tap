@@ -1,0 +1,142 @@
+name: Update duckdb-otlp
+
+# Pull model, on purpose: this tap polls smithclay/duckdb-otlp's public releases
+# with its own GITHUB_TOKEN and pushes to itself. A push from the other repo
+# would be faster, but GITHUB_TOKEN cannot reach another repository, so it would
+# need a GitHub App key or a PAT living in duckdb-otlp. Polling needs no
+# credential at all, and it reconciles releases cut by hand just as happily.
+#
+# Caveat worth knowing: GitHub disables scheduled workflows in a repository with
+# no commits for 60 days (it emails first). A tap only gets commits when an
+# upstream release lands, so a long-quiet upstream can switch this off. If that
+# starts happening, the fix is the GitHub App dispatch this deliberately avoids.
+
+on:
+  schedule:
+    # Releases are infrequent enough that weekly keeps up. Mondays 09:17 UTC --
+    # off the hour and off midnight to dodge the cron stampede GitHub queues
+    # behind. `gh workflow run` pulls a release in sooner when one matters.
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to pin (blank = latest release)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-duckdb-otlp
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check for a new release
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.update.outputs.changed }}
+      version: ${{ steps.update.outputs.version }}
+      tag: ${{ steps.update.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Rewrite the formula
+        id: update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Via env, not a ${{ }} interpolation into the script body: a
+          # workflow_dispatch input is attacker-controllable text.
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "${TAG}" ]; then
+            .github/scripts/update-duckdb-otlp.py --tag "${TAG}"
+          else
+            .github/scripts/update-duckdb-otlp.py
+          fi
+
+      - uses: actions/upload-artifact@v7
+        if: steps.update.outputs.changed == 'true'
+        with:
+          name: formula
+          path: Formula/duckdb-otlp.rb
+          if-no-files-found: error
+
+  verify:
+    name: Verify on ${{ matrix.os }}
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: formula
+          path: Formula
+
+      - name: Tap this working tree
+        # brew will not audit or install a bare file path, and `brew tap <url>`
+        # would clone the committed state -- which is exactly the version
+        # without the bump we are here to test. Link the working tree in.
+        run: |
+          set -euo pipefail
+          tap="$(brew --repository)/Library/Taps/smithclay/homebrew-tap"
+          mkdir -p "$(dirname "$tap")"
+          ln -s "$GITHUB_WORKSPACE" "$tap"
+
+      - run: brew style smithclay/tap/duckdb-otlp
+      - run: brew audit --strict --online smithclay/tap/duckdb-otlp
+
+      - name: Service block renders
+        run: |
+          set -euo pipefail
+          brew info --json=v2 smithclay/tap/duckdb-otlp | python3 -c '
+          import json, sys
+          service = json.load(sys.stdin)["formulae"][0].get("service")
+          assert service, "formula lost its service block"
+          assert service["run"][1] == "serve", service["run"]
+          assert service["keep_alive"] == {"always": True}, service["keep_alive"]
+          print(json.dumps(service, indent=2))
+          '
+
+      - run: brew install --formula smithclay/tap/duckdb-otlp
+      - run: brew test --formula smithclay/tap/duckdb-otlp
+
+  commit:
+    name: Commit the bump
+    needs: [check, verify]
+    if: needs.check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: formula
+          path: Formula
+
+      - name: Push to main
+        env:
+          VERSION: ${{ needs.check.outputs.version }}
+          TAG: ${{ needs.check.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- Formula/duckdb-otlp.rb; then
+            echo "formula already at ${VERSION} on main; nothing to push"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/duckdb-otlp.rb
+          git commit -m "duckdb-otlp ${VERSION}" \
+            -m "https://github.com/smithclay/duckdb-otlp/releases/tag/${TAG}"
+          git push
