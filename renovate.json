@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Only the workflows are Renovate's business here.",
+    "Renovate's homebrew manager matches Formula/*.rb, but the formulae in this tap point at per-architecture release assets rather than the source archives that manager understands, and duckdb-otlp already bumps itself via update-duckdb-otlp.yml. Leaving it enabled would put the two in each other's way."
+  ],
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "github-actions"
+  ],
+  "packageRules": [
+    {
+      "description": "One PR for all action bumps: this tap has a single workflow, so splitting them is pure noise.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions"
+    }
+  ]
+}
