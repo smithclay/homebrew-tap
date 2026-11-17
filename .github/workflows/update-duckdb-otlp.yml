@@ -116,7 +116,7 @@ jobs:
           '
 
       - run: brew install --formula smithclay/tap/duckdb-otlp
-      - run: brew test --formula smithclay/tap/duckdb-otlp
+      - run: brew test smithclay/tap/duckdb-otlp
 
   commit:
     name: Commit the bump
