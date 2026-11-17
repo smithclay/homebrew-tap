@@ -81,14 +81,21 @@ jobs:
           name: formula
           path: Formula
 
+      # Install brew rather than assume the runner image has it: ubuntu-latest moved
+      # to an image without Homebrew in October, and every bump since failed on
+      # `brew: command not found` before testing anything.
+      - uses: Homebrew/actions/setup-homebrew@main
+
       - name: Tap this working tree
         # brew will not audit or install a bare file path, and `brew tap <url>`
         # would clone the committed state -- which is exactly the version
-        # without the bump we are here to test. Link the working tree in.
+        # without the bump we are here to test. Link the working tree in,
+        # replacing whatever setup-homebrew put there for this repository.
         run: |
           set -euo pipefail
           tap="$(brew --repository)/Library/Taps/smithclay/homebrew-tap"
           mkdir -p "$(dirname "$tap")"
+          rm -rf "$tap"
           ln -s "$GITHUB_WORKSPACE" "$tap"
 
       - run: brew style smithclay/tap/duckdb-otlp
