@@ -76,15 +76,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Install brew rather than assume the runner image has it: ubuntu-latest moved
+      # to an image without Homebrew in October, and every bump since failed on
+      # `brew: command not found` before testing anything. It must run before the
+      # artifact download: for a homebrew-* repository it resets the checkout,
+      # which would discard the bumped formula and audit the committed one.
+      - uses: Homebrew/actions/setup-homebrew@main
+
       - uses: actions/download-artifact@v8
         with:
           name: formula
           path: Formula
-
-      # Install brew rather than assume the runner image has it: ubuntu-latest moved
-      # to an image without Homebrew in October, and every bump since failed on
-      # `brew: command not found` before testing anything.
-      - uses: Homebrew/actions/setup-homebrew@main
 
       - name: Tap this working tree
         # brew will not audit or install a bare file path, and `brew tap <url>`

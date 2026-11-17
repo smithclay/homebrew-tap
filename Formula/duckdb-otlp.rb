@@ -1,7 +1,6 @@
 class DuckdbOtlp < Formula
   desc "Stream, store, and query OpenTelemetry (OTLP) data in DuckDB"
   homepage "https://smithclay.github.io/duckdb-otlp/"
-  version "0.7.2"
   license "MIT"
 
   livecheck do

@@ -76,16 +76,8 @@ def checksums(assets):
     return sums
 
 
-def rewrite(text, tag, version, sums):
+def rewrite(text, tag, sums):
     base = f"https://github.com/{REPO}/releases/download/{tag}"
-
-    text, n = re.subn(
-        r'^(\s*version ")[^"]*(")',
-        lambda m: m.group(1) + version + m.group(2),
-        text, count=1, flags=re.MULTILINE,
-    )
-    if n != 1:
-        die("no `version \"...\"` line found in the formula")
 
     for platform in PLATFORMS:
         name = f"duckdb-otlp-{tag}-{platform}.tar.gz"
@@ -127,19 +119,23 @@ def main():
     with open(args.formula) as f:
         text = f.read()
 
-    current = re.search(r'^\s*version "([^"]*)"', text, re.MULTILINE)
-    if not current:
-        die("no `version \"...\"` line found in the formula")
+    # The formula has no `version` line: brew scans it from the URLs, and
+    # `brew audit --strict` rejects one that only repeats them. Read the version
+    # back the same way, and insist every URL agrees.
+    pinned = set(re.findall(rf'/{re.escape(REPO)}/releases/download/v([^/"]+)/', text))
+    if len(pinned) != 1:
+        die(f"expected every release URL to pin one version, found {sorted(pinned) or 'none'}")
+    current = pinned.pop()
 
-    if current.group(1) == version:
+    if current == version:
         print(f"duckdb-otlp is already at {version}")
         return emit(changed=False, version=version, tag=tag)
 
-    updated = rewrite(text, tag, version, checksums(release["assets"]))
+    updated = rewrite(text, tag, checksums(release["assets"]))
     with open(args.formula, "w") as f:
         f.write(updated)
 
-    print(f"duckdb-otlp {current.group(1)} -> {version}")
+    print(f"duckdb-otlp {current} -> {version}")
     return emit(changed=True, version=version, tag=tag)
 
 
