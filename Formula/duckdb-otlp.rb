@@ -10,23 +10,23 @@ class DuckdbOtlp < Formula
 
   on_macos do
     on_arm do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.1/duckdb-otlp-v0.8.1-darwin-arm64.tar.gz"
-      sha256 "9e58e0f345dfe6fd05ac85987bb74dd83b1646038a4d141d1e638ba0ac5b7e57"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.2/duckdb-otlp-v0.8.2-darwin-arm64.tar.gz"
+      sha256 "6ca62383bfcce749aa62c7fd1432fa4cdced68b4f7fd6385e629573910f064ca"
     end
     on_intel do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.1/duckdb-otlp-v0.8.1-darwin-amd64.tar.gz"
-      sha256 "94e6f8e259ba17e097123ba49df47f5b31442f3ef4aa9925f317d68a37be0e16"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.2/duckdb-otlp-v0.8.2-darwin-amd64.tar.gz"
+      sha256 "69fa050820aee3ea00dbe95ef6b4a22b72f45a740d2eae4cf19bba43a69064ba"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.1/duckdb-otlp-v0.8.1-linux-arm64.tar.gz"
-      sha256 "5d26359b5119047d0b9f828933e37eb279daffe1b222609d724413a12f6bc4ad"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.2/duckdb-otlp-v0.8.2-linux-arm64.tar.gz"
+      sha256 "1b3f2491d87e4b75a5d1a57f9f1b5ded08e349205aeaad1b4db56736042d782c"
     end
     on_intel do
-      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.1/duckdb-otlp-v0.8.1-linux-amd64.tar.gz"
-      sha256 "2b460b6c1f2c081b228f30a5b26194c9477ffbed83639e46bd1349820047eec6"
+      url "https://github.com/smithclay/duckdb-otlp/releases/download/v0.8.2/duckdb-otlp-v0.8.2-linux-amd64.tar.gz"
+      sha256 "7965aa9c8d570fe3f69c0e45b181535773f754bdbf73e451a5e8476963c08b6e"
     end
   end
 
