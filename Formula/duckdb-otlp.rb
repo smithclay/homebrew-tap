@@ -1,6 +1,10 @@
 class DuckdbOtlp < Formula
   desc "Stream, store, and query OpenTelemetry (OTLP) data in DuckDB"
   homepage "https://smithclay.github.io/duckdb-otlp/"
+  # Explicit because the release asset names end in the architecture: brew scans
+  # the last number in `...-linux-amd64.tar.gz`, so without this every release is
+  # version "64" and `brew upgrade` never sees a newer one.
+  version "0.9.0"
   license "MIT"
 
   livecheck do
@@ -37,8 +41,7 @@ class DuckdbOtlp < Formula
   # Defaults only: duckdb-otlp has no config file, and `brew services` rewrites the
   # plist on every restart, so anything set here is all a managed service can get.
   # Those defaults are the safe ones -- loopback-only listeners, and the data
-  # directory left where the CLI looks for it so `duckdb-otlp query` reads the same
-  # catalog the service writes.
+  # directory left at the CLI's default so the catalog is where the caveats say.
   service do
     run [opt_bin/"duckdb-otlp", "serve"]
     keep_alive true
@@ -58,12 +61,14 @@ class DuckdbOtlp < Formula
 
       Point an OpenTelemetry exporter at http://127.0.0.1:4318/v1/{logs,traces,metrics}.
 
-      The running server holds an exclusive lock on the control database, so
-      `duckdb-otlp query` cannot read it while the service is up. Stop the service
-      first, or run the server with a Quack SQL endpoint instead:
+      duckdb-otlp only receives. Query what it stored with the `duckdb` CLI
+      (`brew install duckdb`). The running service holds the catalog's write lock,
+      so stop it first, or run the server yourself with `--quack PORT` and query
+      it over Quack instead:
 
         brew services stop duckdb-otlp
-        duckdb-otlp query "SELECT * FROM otlp_logs LIMIT 10"
+        duckdb -c "ATTACH 'ducklake:$HOME/.local/share/duckdb-otlp/ducklake/catalog.duckdb' AS otel (READ_ONLY);
+                   FROM otel.otlp_logs LIMIT 10"
 
       Service logs: #{var}/log/duckdb-otlp.log
 
