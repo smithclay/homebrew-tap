@@ -78,6 +78,9 @@ def checksums(assets):
 
 def rewrite(text, tag, sums):
     base = f"https://github.com/{REPO}/releases/download/{tag}"
+    text, n = re.subn(r'^  version "[^"]+"$', f'  version "{tag[1:]}"', text, flags=re.MULTILINE)
+    if n != 1:
+        die(f"expected exactly one top-level version line, found {n}")
 
     for platform in PLATFORMS:
         name = f"duckdb-otlp-{tag}-{platform}.tar.gz"
@@ -119,13 +122,16 @@ def main():
     with open(args.formula) as f:
         text = f.read()
 
-    # The formula has no `version` line: brew scans it from the URLs, and
-    # `brew audit --strict` rejects one that only repeats them. Read the version
-    # back the same way, and insist every URL agrees.
+    # The formula carries an explicit `version` line, because brew would scan
+    # "64" out of the asset names (`...-linux-amd64.tar.gz`). It must agree with
+    # every release URL, so read both and insist they match.
     pinned = set(re.findall(rf'/{re.escape(REPO)}/releases/download/v([^/"]+)/', text))
-    if len(pinned) != 1:
-        die(f"expected every release URL to pin one version, found {sorted(pinned) or 'none'}")
-    current = pinned.pop()
+    declared = re.findall(r'^  version "([^"]+)"$', text, re.MULTILINE)
+    if len(declared) != 1:
+        die(f"expected exactly one top-level version line, found {len(declared)}")
+    if pinned != set(declared):
+        die(f"version {declared[0]} disagrees with the release URLs {sorted(pinned) or 'none'}")
+    current = declared[0]
 
     if current == version:
         print(f"duckdb-otlp is already at {version}")
